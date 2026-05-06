@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Light House Dreams</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0b1f3a;
+      --deep:   #071428;
+      --gold:   #c9a84c;
+      --gold-lt:#e0c47a;
+      --cream:  #f5f0e8;
+      --text:   #d6cfc3;
+      --muted:  #7a8ea8;
+      --white:  #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--deep);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: .5;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 5vw;
+      background: linear-gradient(to bottom, rgba(7,20,40,.97) 0%, transparent 100%);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(201,168,76,.12);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: .8rem;
+      text-decoration: none;
+    }
+    .nav-logo svg { width: 36px; height: 36px; }
+    .nav-logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem; font-weight: 600; letter-spacing: .04em;
+      color: var(--white);
+    }
+    .nav-logo-text span { color: var(--gold); }
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a {
+      font-size: .78rem; font-weight: 500; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--muted);
+      text-decoration: none; transition: color .25s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta {
+      padding: .55rem 1.4rem;
+      border: 1px solid var(--gold);
+      border-radius: 2px;
+      font-size: .75rem; font-weight: 500; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--gold);
+      text-decoration: none; transition: background .25s, color .25s;
+    }
+    .nav-cta:hover { background: var(--gold); color: var(--deep); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: grid; place-items: center;
+      position: relative; overflow: hidden;
+      padding: 8rem 5vw 5rem;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(201,168,76,.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 80% at 10% 80%, rgba(11,31,58,.9) 0%, transparent 80%),
+        linear-gradient(160deg, #071428 0%, #0d2244 50%, #071428 100%);
+    }
+    .hero-lines {
+      position: absolute; inset: 0; z-index: 1;
+      background-image:
+        linear-gradient(rgba(201,168,76,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,.04) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+    /* lighthouse glow */
+    .hero-glow {
+      position: absolute; right: 8vw; top: 50%; transform: translateY(-50%);
+      width: 420px; height: 420px; z-index: 1;
+      background: radial-gradient(circle at 50% 50%, rgba(201,168,76,.18) 0%, transparent 65%);
+      animation: pulse 4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:.7;transform:translateY(-50%) scale(1)} 50%{opacity:1;transform:translateY(-50%) scale(1.06)} }
+
+    .hero-content { position: relative; z-index: 2; max-width: 720px; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font-size: .72rem; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.8rem;
+    }
+    .hero-tag::before {
+      content: ''; display: block; width: 36px; height: 1px; background: var(--gold);
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 300; line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 1.4rem;
+    }
+    h1 em { font-style: italic; color: var(--gold-lt); }
+    .hero-sub {
+      font-size: 1rem; font-weight: 300; line-height: 1.75;
+      color: var(--muted); max-width: 520px; margin-bottom: 2.6rem;
+    }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      padding: .85rem 2.2rem;
+      background: var(--gold); color: var(--deep);
+      font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+      text-decoration: none; border-radius: 2px; transition: background .25s, transform .2s;
+    }
+    .btn-primary:hover { background: var(--gold-lt); transform: translateY(-2px); }
+    .btn-outline {
+      padding: .85rem 2.2rem;
+      border: 1px solid rgba(201,168,76,.4); color: var(--gold);
+      font-size: .78rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+      text-decoration: none; border-radius: 2px; transition: border-color .25s, color .25s;
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold-lt); }
+
+    .hero-stats {
+      position: relative; z-index: 2;
+      display: flex; gap: 3rem; flex-wrap: wrap;
+      margin-top: 5rem; padding-top: 2.5rem;
+      border-top: 1px solid rgba(201,168,76,.14);
+    }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem; font-weight: 400; color: var(--gold);
+    }
+    .stat-label {
+      font-size: .7rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--muted); margin-top: .2rem;
+    }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 7rem 5vw; }
+    .section-tag {
+      font-size: .7rem; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .section-tag::before { content:''; width:28px; height:1px; background:var(--gold); display:block; }
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 300; color: var(--white); line-height: 1.15;
+    }
+    h2 em { font-style: italic; color: var(--gold-lt); }
+    .divider {
+      width: 60px; height: 1px; background: var(--gold);
+      margin: 1.6rem 0;
+    }
+
+    /* ── ABOUT ── */
+    #about {
+      background: var(--navy);
+      border-top: 1px solid rgba(201,168,76,.08);
+      border-bottom: 1px solid rgba(201,168,76,.08);
+    }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;
+      align-items: center; max-width: 1200px; margin: 0 auto;
+    }
+    .about-img-wrap {
+      position: relative;
+    }
+    .about-img-box {
+      width: 100%; aspect-ratio: 4/5;
+      background: linear-gradient(135deg, #0d2244 0%, #1a3a6e 100%);
+      border: 1px solid rgba(201,168,76,.2);
+      border-radius: 2px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .about-img-box svg { width: 120px; opacity: .3; }
+    .about-badge {
+      position: absolute; bottom: -1.5rem; right: -1.5rem;
+      width: 140px; height: 140px;
+      background: var(--gold);
+      border-radius: 50%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: var(--deep);
+    }
+    .about-badge-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem; font-weight: 600; line-height: 1;
+    }
+    .about-badge-lbl { font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; text-align: center; }
+    .about-text p { font-size: .95rem; font-weight: 300; line-height: 1.8; color: var(--muted); margin-bottom: 1.2rem; }
+    .about-pillars { margin-top: 2rem; display: flex; flex-direction: column; gap: .8rem; }
+    .pillar {
+      display: flex; align-items: center; gap: 1rem;
+      font-size: .82rem; letter-spacing: .06em; color: var(--text);
+    }
+    .pillar-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink:0; }
+
+    /* ── SERVICES ── */
+    #services { max-width: 1200px; margin: 0 auto; padding: 7rem 5vw; }
+    .services-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; flex-wrap: wrap; gap: 1.5rem; }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5px;
+      background: rgba(201,168,76,.08);
+      border: 1px solid rgba(201,168,76,.08);
+    }
+    .service-card {
+      background: var(--deep);
+      padding: 2.4rem 2rem;
+      position: relative; overflow: hidden;
+      transition: background .3s;
+      cursor: default;
+    }
+    .service-card:hover { background: #0f2040; }
+    .service-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--gold); transform: scaleX(0); transform-origin: left;
+      transition: transform .35s ease;
+    }
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-letter {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem; font-weight: 300; color: rgba(201,168,76,.15);
+      line-height: 1; margin-bottom: 1.2rem;
+    }
+    .service-card:hover .service-letter { color: rgba(201,168,76,.28); }
+    .service-icon { margin-bottom: 1.2rem; }
+    .service-icon svg { width: 36px; height: 36px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+    .service-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem; font-weight: 600; color: var(--white);
+      margin-bottom: .8rem;
+    }
+    .service-desc { font-size: .83rem; font-weight: 300; line-height: 1.75; color: var(--muted); }
+
+    /* ── WHY US ── */
+    #why {
+      background: linear-gradient(160deg, #071428 0%, #0b1f3a 60%, #071428 100%);
+      border-top: 1px solid rgba(201,168,76,.08);
+    }
+    .why-inner { max-width: 1200px; margin: 0 auto; }
+    .why-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 2rem; margin-top: 4rem;
+    }
+    .why-card {
+      padding: 2rem 1.5rem;
+      border: 1px solid rgba(201,168,76,.1);
+      border-radius: 2px; text-align: center;
+      transition: border-color .3s, transform .3s;
+    }
+    .why-card:hover { border-color: rgba(201,168,76,.4); transform: translateY(-4px); }
+    .why-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.8rem; color: var(--gold); line-height: 1;
+      margin-bottom: .8rem;
+    }
+    .why-title { font-size: .9rem; font-weight: 500; color: var(--white); margin-bottom: .7rem; letter-spacing: .04em; }
+    .why-desc { font-size: .8rem; color: var(--muted); line-height: 1.7; }
+
+    /* ── CONTACT ── */
+    #contact {
+      background: var(--navy);
+      border-top: 1px solid rgba(201,168,76,.1);
+    }
+    .contact-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start;
+    }
+    .contact-info h2 { margin-bottom: 1.2rem; }
+    .contact-info p { font-size: .9rem; color: var(--muted); line-height: 1.8; margin-bottom: 2rem; }
+    .contact-details { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 2rem; }
+    .contact-item { display: flex; gap: 1rem; align-items: flex-start; }
+    .contact-item svg { width: 20px; height: 20px; stroke: var(--gold); fill: none; stroke-width: 1.5; flex-shrink:0; margin-top:2px; }
+    .contact-item-text { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+    .contact-item-label { font-size: .68rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: .2rem; }
+
+    .contact-form { display: flex; flex-direction: column; gap: 1.2rem; }
+    .form-group { display: flex; flex-direction: column; gap: .5rem; }
+    .form-group label { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(201,168,76,.2);
+      border-radius: 2px; padding: .85rem 1rem;
+      color: var(--text); font-family: 'Jost', sans-serif;
+      font-size: .88rem; outline: none;
+      transition: border-color .25s;
+    }
+    .form-group select option { background: var(--navy); }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus { border-color: var(--gold); }
+    .form-group textarea { resize: vertical; min-height: 130px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .btn-submit {
+      padding: .9rem 2rem;
+      background: var(--gold); color: var(--deep);
+      font-family: 'Jost', sans-serif;
+      font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+      border: none; border-radius: 2px; cursor: pointer;
+      transition: background .25s, transform .2s;
+      align-self: flex-start;
+    }
+    .btn-submit:hover { background: var(--gold-lt); transform: translateY(-2px); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--deep);
+      border-top: 1px solid rgba(201,168,76,.1);
+      padding: 3rem 5vw;
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; color: var(--white);
+    }
+    .footer-logo span { color: var(--gold); }
+    .footer-copy { font-size: .75rem; color: var(--muted); letter-spacing: .05em; }
+    .footer-links { display: flex; gap: 1.8rem; }
+    .footer-links a { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--gold); }
+
+    /* ── ANIMATIONS ── */
+    .fade-up {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .about-grid, .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .why-grid { grid-template-columns: 1fr 1fr; }
+      .about-badge { display: none; }
+      nav { padding: 1rem 4vw; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 600px) {
+      .why-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .hero-stats { gap: 1.5rem; }
+      h1 { font-size: 2.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="18,4 22,14 32,14 24,20 27,30 18,24 9,30 12,20 4,14 14,14" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
+    </svg>
+    <span class="nav-logo-text">Light House <span>Dreams</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get In Touch</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-glow"></div>
+
+  <div style="position:relative;z-index:2;width:100%;max-width:1200px;margin:0 auto;">
+    <div class="hero-content fade-up">
+      <div class="hero-tag">Lighting the path to opportunity</div>
+      <h1>Where <em>Vision</em> Meets<br>Enterprise</h1>
+      <p class="hero-sub">
+        Light House Dreams is a diversified conglomerate delivering excellence across general services, real estate, agriculture, trade, and investment — guiding businesses and communities toward sustainable growth.
+      </p>
+      <div class="hero-btns">
+        <a href="#services" class="btn-primary">Explore Our Services</a>
+        <a href="#contact" class="btn-outline">Partner With Us</a>
+      </div>
+    </div>
+
+    <div class="hero-stats fade-up" style="transition-delay:.2s">
+      <div>
+        <div class="stat-num">5+</div>
+        <div class="stat-label">Core Business Verticals</div>
+      </div>
+      <div>
+        <div class="stat-num">360°</div>
+        <div class="stat-label">End-to-End Solutions</div>
+      </div>
+      <div>
+        <div class="stat-num">Global</div>
+        <div class="stat-label">Trade & Distribution Reach</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-img-wrap fade-up">
+      <div class="about-img-box">
+        <!-- Lighthouse SVG -->
+        <svg viewBox="0 0 100 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="42" y="60" width="16" height="60" fill="#c9a84c" opacity=".5"/>
+          <polygon points="50,0 70,60 30,60" fill="#c9a84c" opacity=".6"/>
+          <rect x="38" y="52" width="24" height="10" fill="#c9a84c" opacity=".8"/>
+          <circle cx="50" cy="30" r="10" fill="#e0c47a" opacity=".9"/>
+          <line x1="50" y1="30" x2="10" y2="0" stroke="#e0c47a" stroke-width="1.5" opacity=".4"/>
+          <line x1="50" y1="30" x2="90" y2="0" stroke="#e0c47a" stroke-width="1.5" opacity=".4"/>
+          <line x1="50" y1="30" x2="0" y2="50" stroke="#e0c47a" stroke-width="1" opacity=".25"/>
+          <line x1="50" y1="30" x2="100" y2="50" stroke="#e0c47a" stroke-width="1" opacity=".25"/>
+          <line x1="42" y1="75" x2="58" y2="75" stroke="#c9a84c" stroke-width="1" opacity=".5"/>
+          <line x1="42" y1="90" x2="58" y2="90" stroke="#c9a84c" stroke-width="1" opacity=".5"/>
+          <line x1="42" y1="105" x2="58" y2="105" stroke="#c9a84c" stroke-width="1" opacity=".5"/>
+        </svg>
+      </div>
+      <div class="about-badge">
+        <div class="about-badge-num">LHD</div>
+        <div class="about-badge-lbl">Since<br>Inception</div>
+      </div>
+    </div>
+
+    <div class="about-text fade-up" style="transition-delay:.15s">
+      <div class="section-tag">About the Company</div>
+      <h2>A Lighthouse of <em>Opportunity</em></h2>
+      <div class="divider"></div>
+      <p>
+        Light House Dreams is a duly incorporated company established with a clear mandate: to pursue business excellence across a diverse range of industries — from supply chain and project procurement to real estate, agriculture, and international trade.
+      </p>
+      <p>
+        We operate with unwavering integrity and a commitment to creating tangible value for our partners, clients, and stakeholders — lighting the way through every challenge and opportunity.
+      </p>
+      <div class="about-pillars">
+        <div class="pillar"><span class="pillar-dot"></span> Integrity in every engagement</div>
+        <div class="pillar"><span class="pillar-dot"></span> Strategic and diversified operations</div>
+        <div class="pillar"><span class="pillar-dot"></span> Transparent governance and compliance</div>
+        <div class="pillar"><span class="pillar-dot"></span> Sustainable growth and community impact</div>
+        <div class="pillar"><span class="pillar-dot"></span> Global perspective, local expertise</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ── -->
+<section id="services" style="background:var(--deep);padding:7rem 5vw;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="services-header">
+      <div>
+        <div class="section-tag">What We Do</div>
+        <h2>Our Business <em>Verticals</em></h2>
+      </div>
+      <p style="font-size:.85rem;color:var(--muted);max-width:340px;line-height:1.7;">
+        Five core pillars, each delivering focused expertise and integrated solutions across industries.
+      </p>
+    </div>
+
+    <div class="services-grid fade-up">
+
+      <!-- A -->
+      <div class="service-card">
+        <div class="service-letter">A</div>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="service-title">General Services & Procurement</div>
+        <div class="service-desc">
+          We carry on business of general services and apply for contracts, leases, and concessions relating to supply chain management, project procurement, maintenance, repairs, and operations (MRO) services — providing end-to-end solutions for complex organizational needs.
+        </div>
+      </div>
+
+      <!-- B -->
+      <div class="service-card">
+        <div class="service-letter">B</div>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div class="service-title">Real Estate & Agriculture</div>
+        <div class="service-desc">
+          We engage in real estate investment, advisory, financing, and property development. Simultaneously, we operate large-scale agriculture, farming, piggery, food processing, and agribusiness ventures — building foundations for food security and property wealth.
+        </div>
+      </div>
+
+      <!-- C -->
+      <div class="service-card">
+        <div class="service-letter">C</div>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+        </div>
+        <div class="service-title">Import, Export & Distribution</div>
+        <div class="service-desc">
+          We carry on business of importation and exportation, marketing, sale, supply, and distribution of all lawful goods, merchandise, and commodities — bridging international markets with reliable, efficient logistics and trading infrastructure.
+        </div>
+      </div>
+
+      <!-- D -->
+      <div class="service-card">
+        <div class="service-letter">D</div>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div class="service-title">Investment & Asset Holdings</div>
+        <div class="service-desc">
+          We carry on general businesses and acquire and hold — directly or through nominees — land, shares, stocks, debentures, bonds, obligations, and securities issued or guaranteed by companies worldwide, building a resilient and diversified investment portfolio.
+        </div>
+      </div>
+
+      <!-- E -->
+      <div class="service-card">
+        <div class="service-letter">E</div>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <div class="service-title">Capital & Financial Solutions</div>
+        <div class="service-desc">
+          We borrow or raise money in such manner as the company may think fit, and undertake all ancillary activities incidental or conducive to the attainment of our corporate objectives — ensuring robust financial capacity for strategic growth and operations.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY US ── -->
+<section id="why">
+  <div class="why-inner">
+    <div class="fade-up" style="max-width:600px;">
+      <div class="section-tag">Why Choose Us</div>
+      <h2>Built on <em>Trust,</em><br>Driven by Results</h2>
+      <div class="divider"></div>
+      <p style="font-size:.9rem;color:var(--muted);line-height:1.8;">
+        Light House Dreams combines broad sector expertise with focused execution, ensuring every engagement delivers measurable value.
+      </p>
+    </div>
+
+    <div class="why-grid fade-up" style="transition-delay:.15s">
+      <div class="why-card">
+        <div class="why-num">01</div>
+        <div class="why-title">Diversified Expertise</div>
+        <div class="why-desc">From supply chain to real estate to global trade — our multi-sector presence means complete solutions under one corporate umbrella.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-num">02</div>
+        <div class="why-title">Legally Structured</div>
+        <div class="why-desc">Duly incorporated and operating with full legal compliance, our corporate structure ensures accountability and security for all stakeholders.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-num">03</div>
+        <div class="why-title">Strategic Partnerships</div>
+        <div class="why-desc">We leverage a wide network of contractors, agencies, and business entities to secure favorable contracts, leases, and concessions.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-num">04</div>
+        <div class="why-title">Global Reach</div>
+        <div class="why-desc">Our import/export and investment operations extend across international markets, delivering global-standard services with local sensibility.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-num">05</div>
+        <div class="why-title">Financial Flexibility</div>
+        <div class="why-desc">With the capacity to raise and deploy capital flexibly, we execute projects and investments at the scale our clients and partners demand.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-num">06</div>
+        <div class="why-title">Long-Term Vision</div>
+        <div class="why-desc">We are not transactional — we build lasting relationships, enduring assets, and compounding value over time for every stakeholder.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-info fade-up">
+      <div class="section-tag">Get In Touch</div>
+      <h2>Let's Build<br><em>Something Together</em></h2>
+      <div class="divider"></div>
+      <p>Whether you are seeking a strategic partner, exploring investment opportunities, or looking to engage our services — we welcome the conversation. Reach out and let us illuminate the path forward.</p>
+
+      <div class="contact-details">
+        <div class="contact-item">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div>
+            <div class="contact-item-label">Headquarters</div>
+            <div class="contact-item-text">Light House Dreams Corporate Office<br>Uyo, Nigeria</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <div>
+            <div class="contact-item-label">Email</div>
+            <div class="contact-item-text">contactlighthousedreams@gmail.com</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.18 2 2 0 012.18 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          <div>
+            <div class="contact-item-label">Phone</div>
+            <div class="contact-item-text">+234 903 433 7845</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form fade-up" style="transition-delay:.15s">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" placeholder="Juan"/>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" placeholder="dela Cruz"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" placeholder="juan@company.com"/>
+      </div>
+      <div class="form-group">
+        <label>Company / Organization</label>
+        <input type="text" placeholder="Your Company Name"/>
+      </div>
+      <div class="form-group">
+        <label>Area of Interest</label>
+        <select>
+          <option value="">— Select a Service —</option>
+          <option>General Services & Procurement</option>
+          <option>Real Estate & Agriculture</option>
+          <option>Import, Export & Distribution</option>
+          <option>Investment & Asset Holdings</option>
+          <option>Capital & Financial Solutions</option>
+          <option>General Inquiry</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea placeholder="Tell us about your needs or inquiry…"></textarea>
+      </div>
+      <button class="btn-submit" type="button">Send Message</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Light House <span>Dreams</span></div>
+    <div class="footer-copy">© 2025 Light House Dreams. All rights reserved.</div>
+    <div class="footer-links">
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Fade-in on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Immediately visible hero
+  document.querySelectorAll('#hero .fade-up').forEach(el => {
+    setTimeout(() => el.classList.add('visible'), 200);
+  });
+</script>
+</body>
+</html>
